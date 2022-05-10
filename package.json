@@ -11,7 +11,7 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:prediktor.helloWorld"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
