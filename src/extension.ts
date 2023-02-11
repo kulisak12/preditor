@@ -1,6 +1,5 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+const fetch = require('node-fetch');
 
 const TRIGGER_CHARS = [
 	" ",
@@ -16,30 +15,52 @@ const TRIGGER_CHARS = [
 	"/",
 ];
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+const API = "http://127.0.0.1:3000";
+
+class PredictionProvider implements vscode.CompletionItemProvider {
+	async provideCompletionItems(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		token: vscode.CancellationToken,
+		context: vscode.CompletionContext
+	): Promise<vscode.CompletionItem[]> {
+		const line = document.lineAt(position);
+		const requestData = {
+			text: line.text,
+		};
+
+		const responseData = await apiPostRequest(API, requestData);
+		const prediction: string = responseData.prediction;
+
+		const completionItem = new vscode.CompletionItem(prediction, vscode.CompletionItemKind.Text);
+		completionItem.insertText = prediction;
+		completionItem.range = new vscode.Range(position, position);
+		return [completionItem];
+	}
+}
+
 export function activate(context: vscode.ExtensionContext) {
 
-	// ? provideCompletionItems can be async
 	const provider = vscode.languages.registerCompletionItemProvider(
 		{ pattern: "**" },
-		{
-			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
-
-				const linePrefix = document.lineAt(position).text.substring(0, position.character);
-				const words = linePrefix.split(' ');
-				const arbitraryIndex = Math.max(0, words.length - 4);
-				const completionWords = words.slice(arbitraryIndex);
-				const completionsItems = completionWords.map(word => new vscode.CompletionItem(word), vscode.CompletionItemKind.Text);
-
-				return completionsItems;
-			}
-		},
+		new PredictionProvider(),
 		...TRIGGER_CHARS
-		);
+	);
 
 	context.subscriptions.push(provider);
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
+
+async function apiPostRequest(url: string, data: any): Promise<any> {
+	const response = await fetch(url, {
+		method: "POST",
+		headers: {
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(data),
+	});
+	const responseData = await response.json();
+	return responseData;
+}
