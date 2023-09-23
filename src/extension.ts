@@ -15,6 +15,8 @@ const TRIGGER_CHARS = [
     "/",
 ];
 
+const CHARS_BEFORE = 100;
+const CHARS_AFTER = 20;
 const API = "http://127.0.0.1:3000";
 
 class PredictionProvider implements vscode.CompletionItemProvider {
@@ -24,9 +26,12 @@ class PredictionProvider implements vscode.CompletionItemProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
     ): Promise<vscode.CompletionItem[]> {
-        const line = document.lineAt(position);
+        const rangeStart = advancePosition(document, position, -CHARS_BEFORE);
+        const rangeEnd = advancePosition(document, position, CHARS_AFTER);
+
         const requestData = {
-            text: line.text,
+            text: document.getText(new vscode.Range(rangeStart, rangeEnd)),
+            cursor: document.getText(new vscode.Range(rangeStart, position)).length,
         };
 
         const responseData = await apiPostRequest(API, requestData);
@@ -63,4 +68,18 @@ async function apiPostRequest(url: string, data: any): Promise<any> {
     });
     const responseData = await response.json();
     return responseData;
+}
+
+/**
+ * Advance position by a given number of characters.
+ * Works across lines.
+*/
+function advancePosition(
+    document: vscode.TextDocument,
+    position: vscode.Position,
+    by: number
+): vscode.Position {
+    const offset = document.offsetAt(position);
+    const newOffset = offset + by;
+    return document.positionAt(newOffset);
 }
