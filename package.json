@@ -1,6 +1,6 @@
 {
-  "name": "prediktor",
-  "displayName": "prediktor",
+  "name": "preditor",
+  "displayName": "preditor",
   "description": "Text predictions and corrections",
   "publisher": "kulisak12",
   "version": "0.0.1",
@@ -17,7 +17,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "prediktor.helloWorld",
+        "command": "preditor.helloWorld",
         "title": "Hello World"
       }
     ]
