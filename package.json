@@ -20,7 +20,57 @@
         "command": "preditor.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Preditor",
+      "properties": {
+        "preditor.url": {
+          "type": "string",
+          "default": "http://127.0.0.1:3000",
+          "description": "The URL of the Preditor server"
+        },
+        "preditor.infilling.maxLength": {
+          "type": "integer",
+          "default": 8,
+          "description": "The maximum number of tokens generated during infilling."
+        },
+        "preditor.infilling.numVariants": {
+          "type": "integer",
+          "default": 10,
+          "description": "The number of variants that infilling chooses from."
+        },
+        "preditor.prediction.maxLength": {
+          "type": "integer",
+          "default": 30,
+          "description": "The maximum number of tokens generated during prediction."
+        },
+        "preditor.prediction.confidence": {
+          "type": "number",
+          "default": 5,
+          "description": "Higher confidence leads to longer suggestions."
+        },
+        "preditor.substitution.minVariants": {
+          "type": "integer",
+          "default": 2,
+          "description": "The number of variants added in each iteration. (advanced)"
+        },
+        "preditor.substitution.relaxCount": {
+          "type": "integer",
+          "default": 8,
+          "description": "The number of nodes relaxed in a batch. (advanced)"
+        },
+        "preditor.substitution.poolFactor": {
+          "type": "integer",
+          "default": 5,
+          "description": "Affects the size of the pool during node selection. (advanced)"
+        },
+        "preditor.substitution.lpAlpha": {
+          "type": "number",
+          "default": 0.5,
+          "description": "The hyperparameter for a search heuristic. Higher values speed up the search but may yield incorrect results."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
