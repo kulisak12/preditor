@@ -17,7 +17,6 @@ const TRIGGER_CHARS = [
 
 const CHARS_BEFORE = 100;
 const CHARS_AFTER = 20;
-const API = "http://127.0.0.1:3000";
 
 class PredictionProvider implements vscode.CompletionItemProvider {
     async provideCompletionItems(
@@ -26,6 +25,7 @@ class PredictionProvider implements vscode.CompletionItemProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
     ): Promise<vscode.CompletionItem[]> {
+        const apiBase = getConfig<string>("url");
         const rangeStart = advancePosition(document, position, -CHARS_BEFORE);
         const rangeEnd = advancePosition(document, position, CHARS_AFTER);
 
@@ -34,7 +34,7 @@ class PredictionProvider implements vscode.CompletionItemProvider {
             cursor: document.getText(new vscode.Range(rangeStart, position)).length,
         };
 
-        const responseData = await apiPostRequest(API, requestData);
+        const responseData = await apiPostRequest(apiBase, requestData);
         const prediction: string = responseData.prediction;
 
         const completionItem = new vscode.CompletionItem(prediction, vscode.CompletionItemKind.Text);
@@ -56,6 +56,16 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() { }
+
+
+function getConfig<T>(section: string): T {
+    const main = vscode.workspace.getConfiguration("preditor");
+    const config = main.get<T>(section);
+    if (!config) {
+        throw new Error(`Configuration preditor.${section} not found.`);
+    }
+    return config;
+}
 
 async function apiPostRequest(url: string, data: any): Promise<any> {
     const response = await fetch(url, {
