@@ -29,6 +29,16 @@
           "default": "http://127.0.0.1:3000",
           "description": "The URL of the Preditor server"
         },
+        "preditor.charsBefore": {
+          "type": "int",
+          "default": 200,
+          "description": "The number of characters before the cursor to send to the server."
+        },
+        "preditor.charsAfter": {
+          "type": "int",
+          "default": 100,
+          "description": "The number of characters after the cursor to send to the server."
+        },
         "preditor.infilling.maxLength": {
           "type": "integer",
           "default": 8,

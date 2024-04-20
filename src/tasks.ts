@@ -16,16 +16,13 @@ export const TRIGGER_CHARS = [
     "/",
 ];
 
-const CHARS_BEFORE = 200;
-const CHARS_AFTER = 100;
-
 
 export function buildSuggestionRequest(
     document: vscode.TextDocument,
     position: vscode.Position,
 ): models.SuggestionRequest {
-    const rangeStart = advancePosition(document, position, -CHARS_BEFORE);
-    const rangeEnd = advancePosition(document, position, CHARS_AFTER);
+    const rangeStart = advancePosition(document, position, -getConfig<number>("charsBefore"));
+    const rangeEnd = advancePosition(document, position, -getConfig<number>("charsAfter"));
     const beforeCursor = document.getText(new vscode.Range(rangeStart, position));
     const afterCursor = document.getText(new vscode.Range(position, rangeEnd));
     const request = new models.SuggestionRequest(
