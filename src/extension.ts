@@ -1,22 +1,8 @@
 import * as vscode from 'vscode';
 const fetch = require('node-fetch');
 
-const TRIGGER_CHARS = [
-    " ",
-    ".",
-    ",",
-    ":",
-    "!",
-    "?",
-    "(",
-    ")",
-    "'",
-    '"',
-    "/",
-];
-
-const CHARS_BEFORE = 100;
-const CHARS_AFTER = 20;
+import * as tasks from './tasks';
+import { getConfig } from './utils';
 
 class PredictionProvider implements vscode.CompletionItemProvider {
     async provideCompletionItems(
@@ -25,46 +11,16 @@ class PredictionProvider implements vscode.CompletionItemProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
     ): Promise<vscode.CompletionItem[]> {
+        const requestData = tasks.buildSuggestionRequest(document, position);
         const apiBase = getConfig<string>("url");
-        const rangeStart = advancePosition(document, position, -CHARS_BEFORE);
-        const rangeEnd = advancePosition(document, position, CHARS_AFTER);
+        const responseData = await apiPostRequest(apiBase + "/suggestion/", requestData);
+        const suggestion: string = responseData.output;
 
-        const requestData = {
-            text: document.getText(new vscode.Range(rangeStart, rangeEnd)),
-            cursor: document.getText(new vscode.Range(rangeStart, position)).length,
-        };
-
-        const responseData = await apiPostRequest(apiBase, requestData);
-        const prediction: string = responseData.prediction;
-
-        const completionItem = new vscode.CompletionItem(prediction, vscode.CompletionItemKind.Text);
-        completionItem.insertText = prediction;
+        const completionItem = new vscode.CompletionItem(suggestion, vscode.CompletionItemKind.Text);
+        completionItem.insertText = suggestion;
         completionItem.range = new vscode.Range(position, position);
         return [completionItem];
     }
-}
-
-export function activate(context: vscode.ExtensionContext) {
-
-    const provider = vscode.languages.registerCompletionItemProvider(
-        { pattern: "**" },
-        new PredictionProvider(),
-        ...TRIGGER_CHARS
-    );
-
-    context.subscriptions.push(provider);
-}
-
-export function deactivate() { }
-
-
-function getConfig<T>(section: string): T {
-    const main = vscode.workspace.getConfiguration("preditor");
-    const config = main.get<T>(section);
-    if (!config) {
-        throw new Error(`Configuration preditor.${section} not found.`);
-    }
-    return config;
 }
 
 async function apiPostRequest(url: string, data: any): Promise<any> {
@@ -74,22 +30,33 @@ async function apiPostRequest(url: string, data: any): Promise<any> {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data, snakeCaseReplacer),
     });
     const responseData = await response.json();
     return responseData;
 }
 
-/**
- * Advance position by a given number of characters.
- * Works across lines.
-*/
-function advancePosition(
-    document: vscode.TextDocument,
-    position: vscode.Position,
-    by: number
-): vscode.Position {
-    const offset = document.offsetAt(position);
-    const newOffset = offset + by;
-    return document.positionAt(newOffset);
+/** JSON replacer that converts the keys from camel case to snake case. */
+function snakeCaseReplacer(key: string, value: any): any {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const output: { [key: string]: any } = {};
+        for (const i in value) {
+            if (Object.prototype.hasOwnProperty.call(value, i)) {
+                output[i.replace(/([A-Z])/g, g => `_${g.toLowerCase()}`)] = value[i];
+            }
+        }
+        return output;
+    }
+    return value;
 }
+
+export function activate(context: vscode.ExtensionContext) {
+    const provider = vscode.languages.registerCompletionItemProvider(
+        { pattern: "**" },
+        new PredictionProvider(),
+        ...tasks.TRIGGER_CHARS
+    );
+    context.subscriptions.push(provider);
+}
+
+export function deactivate() { }
