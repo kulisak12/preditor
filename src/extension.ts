@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 const fetch = require('node-fetch');
 
 import * as tasks from './tasks';
-import { getConfig } from './utils';
+import { PreditorError, getConfig, readErrorResponse, showErrorPopup } from './utils';
 
 class PredictionProvider implements vscode.CompletionItemProvider {
     async provideCompletionItems(
@@ -11,15 +11,22 @@ class PredictionProvider implements vscode.CompletionItemProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
     ): Promise<vscode.CompletionItem[]> {
-        const requestData = tasks.buildSuggestionRequest(document, position);
-        const apiBase = getConfig<string>("url");
-        const responseData = await apiPostRequest(apiBase + "/suggestion/", requestData);
-        const suggestion: string = responseData.output;
+        try {
+            const requestData = tasks.buildSuggestionRequest(document, position);
+            const apiBase = getConfig<string>("url");
+            const responseData = await apiPostRequest(apiBase + "/suggest/", requestData);
+            const suggestion: string = responseData.output;
 
-        const completionItem = new vscode.CompletionItem(suggestion, vscode.CompletionItemKind.Text);
-        completionItem.insertText = suggestion;
-        completionItem.range = new vscode.Range(position, position);
-        return [completionItem];
+            const completionItem = new vscode.CompletionItem(suggestion, vscode.CompletionItemKind.Text);
+            completionItem.insertText = suggestion;
+            completionItem.range = new vscode.Range(position, position);
+            return [completionItem];
+
+        }
+        catch (error) {
+            showErrorPopup(error);
+            return [];
+        }
     }
 }
 
@@ -32,7 +39,14 @@ async function apiPostRequest(url: string, data: any): Promise<any> {
         },
         body: JSON.stringify(data, snakeCaseReplacer),
     });
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+        throw new PreditorError(response.url + ": " + response.statusText);
+    }
     const responseData = await response.json();
+    if (!response.ok) {
+        throw new PreditorError(readErrorResponse(responseData));
+    }
     return responseData;
 }
 
