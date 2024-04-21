@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+
 export class SuggestionRequest {
     beforeCursor: string;
     afterCursor: string;

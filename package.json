@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:plaintext",
+    "onLanguage:markdown"
   ],
   "main": "./out/extension.js",
   "contributes": {
