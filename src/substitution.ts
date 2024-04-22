@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getConfig, getRangeAroundPosition } from './utils';
+import { getConfig, getRangeAroundPosition, showErrorPopup } from './utils';
 import { SubstitutionRequest } from './models';
 import { apiPostRequest } from './api';
 
@@ -12,16 +12,22 @@ class SubstitutionProvider implements vscode.RenameProvider {
         newName: string,
         token: vscode.CancellationToken
     ): Promise<vscode.WorkspaceEdit> {
-        const replaced = document.getWordRangeAtPosition(position);
-        if (!replaced) {
-            return new vscode.WorkspaceEdit();;
+        try {
+            const replaced = document.getWordRangeAtPosition(position);
+            if (!replaced) {
+                return new vscode.WorkspaceEdit();
+            }
+            const contextRange = getRangeAroundPosition(document, position);
+            const requestData = buildSuggestionRequest(document, position, replaced, contextRange, newName);
+            const apiBase = getConfig<string>("url");
+            const responseData = await apiPostRequest(apiBase + "/substitute/", requestData);
+            const substitution: string = responseData.output;
+            return buildEdit(document, contextRange, substitution);
         }
-        const contextRange = getRangeAroundPosition(document, position);
-        const requestData = buildSuggestionRequest(document, position, replaced, contextRange, newName);
-        const apiBase = getConfig<string>("url");
-        const responseData = await apiPostRequest(apiBase + "/substitute/", requestData);
-        const substitution: string = responseData.output;
-        return buildEdit(document, contextRange, substitution);
+        catch (error) {
+            showErrorPopup(error);
+            return new vscode.WorkspaceEdit();
+        }
     }
 }
 
