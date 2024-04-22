@@ -4,6 +4,10 @@
   "description": "Text suggestions and word substitution",
   "publisher": "kulisak12",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kulisak12/preditor"
+  },
   "engines": {
     "vscode": "^1.67.0"
   },
@@ -89,7 +93,7 @@
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.12.7",
-    "@types/vscode": "^1.88.0",
+    "@types/vscode": "^1.67.0",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "@vscode/test-electron": "^2.3.9",
