@@ -1,5 +1,4 @@
 import { PreditorError } from "./utils";
-// const fetch = require('node-fetch');
 
 
 /** Read the error message from the server and formats it as string. */
