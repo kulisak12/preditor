@@ -42,11 +42,11 @@ function buildSuggestionRequest(
     contextRange: vscode.Range,
     newName: string
 ): SubstitutionRequest {
-    const start = document.offsetAt(replaced.start) - document.offsetAt(contextRange.start);
-    const length = replaced.end.character - replaced.start.character;
+    const beforeOld = document.getText(new vscode.Range(contextRange.start, replaced.start));
+    const old = document.getText(replaced);
+    const afterOld = document.getText(new vscode.Range(replaced.end, contextRange.end));
     const request = new SubstitutionRequest(
-        document.getText(contextRange),
-        start, length, newName,
+        beforeOld, old, afterOld, newName,
         getConfig("substitution")
     );
     return request;

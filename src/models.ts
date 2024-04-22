@@ -16,16 +16,16 @@ export class SuggestionRequest {
 }
 
 export class SubstitutionRequest {
-    text: string;
-    start: number;
-    length: number;
+    beforeOld: string;
+    old: string;
+    afterOld: string;
     replacement: string;
     config: vscode.WorkspaceConfiguration;
 
-    constructor(text: string, start: number, length: number, replacement: string, config: vscode.WorkspaceConfiguration) {
-        this.text = text;
-        this.start = start;
-        this.length = length;
+    constructor(beforeOld: string, old: string, afterOld: string, replacement: string, config: vscode.WorkspaceConfiguration) {
+        this.beforeOld = beforeOld;
+        this.old = old;
+        this.afterOld = afterOld;
         this.replacement = replacement;
         this.config = config;
     }
