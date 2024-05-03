@@ -8,6 +8,12 @@ export class PreditorError extends Error {
     }
 }
 
+
+/** Icon that shows when the extension is processing. */
+export const processingIcon = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+processingIcon.text = `$(sync~spin) Preditor`;
+
+
 /** Read the configuration from the settings.json file. */
 export function getConfig<T>(section: string): T {
     const main = vscode.workspace.getConfiguration("preditor");
