@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getConfig, getRangeAroundPosition, showErrorPopup } from './utils';
+import { getConfig, getRangeAroundPosition, showErrorPopup, processingIcon } from './utils';
 import { SubstitutionRequest } from './models';
 import { apiPostRequest } from './api';
 
@@ -13,6 +13,7 @@ class SubstitutionProvider implements vscode.RenameProvider {
         token: vscode.CancellationToken
     ): Promise<vscode.WorkspaceEdit> {
         try {
+            processingIcon.show();
             const replaced = document.getWordRangeAtPosition(position);
             if (!replaced) {
                 return new vscode.WorkspaceEdit();
@@ -27,6 +28,9 @@ class SubstitutionProvider implements vscode.RenameProvider {
         catch (error) {
             showErrorPopup(error);
             return new vscode.WorkspaceEdit();
+        }
+        finally {
+            processingIcon.hide();
         }
     }
 }

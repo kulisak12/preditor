@@ -15,14 +15,20 @@ export function readErrorResponse(response: any): string {
  * @throws {PreditorError} If the response is not successful.
  */
 export async function apiPostRequest(url: string, data: any): Promise<any> {
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data, snakeCaseReplacer),
-    });
+    let response: Response;
+    try {
+        response = await fetch(url, {
+            method: "POST",
+            headers: {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data, snakeCaseReplacer),
+        });
+    }
+    catch (error) {
+        throw new PreditorError("Request failed. Check the URL and the server status.");
+    }
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
         throw new PreditorError(response.url + ": " + response.statusText);

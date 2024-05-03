@@ -3,7 +3,7 @@
   "displayName": "Preditor",
   "description": "Text suggestions and word substitution",
   "publisher": "kulisak12",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/kulisak12/preditor"
@@ -25,16 +25,15 @@
       "properties": {
         "preditor.url": {
           "type": "string",
-          "default": "http://localhost:3000",
           "description": "The URL of the Preditor server."
         },
         "preditor.charsBefore": {
-          "type": "int",
+          "type": "integer",
           "default": 100,
           "description": "The number of characters before the cursor to send to the server."
         },
         "preditor.charsAfter": {
-          "type": "int",
+          "type": "integer",
           "default": 80,
           "description": "The number of characters after the cursor to send to the server."
         },
@@ -45,12 +44,12 @@
         },
         "preditor.infilling.numVariants": {
           "type": "integer",
-          "default": 6,
+          "default": 4,
           "description": "The number of variants that infilling chooses from."
         },
         "preditor.prediction.maxLength": {
           "type": "integer",
-          "default": 20,
+          "default": 10,
           "description": "The maximum number of tokens generated during prediction."
         },
         "preditor.prediction.confidence": {
@@ -61,7 +60,7 @@
         "preditor.substitution.minVariants": {
           "type": "integer",
           "default": 2,
-          "description": "The number of variants added in each iteration. (advanced)"
+          "description": "The minimum number of variants added in each iteration. (advanced)"
         },
         "preditor.substitution.relaxCount": {
           "type": "integer",
@@ -71,12 +70,12 @@
         "preditor.substitution.poolFactor": {
           "type": "integer",
           "default": 5,
-          "description": "Affects the size of the pool during node selection. (advanced)"
+          "description": "What multiple of relax_count to use as the pool size for node selection. (advanced)"
         },
         "preditor.substitution.lpAlpha": {
           "type": "number",
-          "default": 0.4,
-          "description": "The hyperparameter for a search heuristic. Higher values speed up the search but may yield incorrect results."
+          "default": 0.7,
+          "description": "The exponent in the length penalty function. Higher values speed up the search but may yield incorrect results."
         }
       }
     }

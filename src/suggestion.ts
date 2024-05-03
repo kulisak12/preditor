@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getConfig, getRangeAroundPosition, showErrorPopup } from './utils';
+import { getConfig, getRangeAroundPosition, showErrorPopup, processingIcon } from './utils';
 import { apiPostRequest } from './api';
 import { SuggestionRequest } from './models';
 
@@ -28,6 +28,7 @@ class PredictionProvider implements vscode.CompletionItemProvider {
         context: vscode.CompletionContext
     ): Promise<vscode.CompletionItem[]> {
         try {
+            processingIcon.show();
             const requestData = buildSuggestionRequest(document, position);
             const apiBase = getConfig<string>("url");
             const responseData = await apiPostRequest(apiBase + "/suggest/", requestData);
@@ -42,6 +43,9 @@ class PredictionProvider implements vscode.CompletionItemProvider {
         catch (error) {
             showErrorPopup(error);
             return [];
+        }
+        finally {
+            processingIcon.hide();
         }
     }
 }
