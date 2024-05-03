@@ -38,7 +38,7 @@ class SubstitutionProvider implements vscode.RenameProvider {
 /** Register the provider that handles substitution. */
 export function getSubstitutionProvider(): vscode.Disposable {
     const provider = vscode.languages.registerRenameProvider(
-        { pattern: "**" },
+        [{ language: 'plaintext' }, { language: 'markdown' }],
         new SubstitutionProvider()
     );
     return provider;

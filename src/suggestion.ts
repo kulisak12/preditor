@@ -7,16 +7,10 @@ import { SuggestionRequest } from './models';
 /** Characters that trigger the suggestion. */
 const TRIGGER_CHARS = [
     " ",
-    ".",
-    ",",
-    ":",
-    "!",
-    "?",
     "(",
-    ")",
     "'",
     '"',
-    "/",
+    "\n",
 ];
 
 /** Provide completion suggestions for the user. */
@@ -53,7 +47,7 @@ class PredictionProvider implements vscode.CompletionItemProvider {
 /** Register the suggestion provider that handles prediction and infilling. */
 export function getSuggestionProvider(): vscode.Disposable {
     const provider = vscode.languages.registerCompletionItemProvider(
-        { pattern: "**" },
+        [{ language: 'plaintext' }, { language: 'markdown' }],
         new PredictionProvider(),
         ...TRIGGER_CHARS
     );
