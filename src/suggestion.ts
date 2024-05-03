@@ -7,16 +7,10 @@ import { SuggestionRequest } from './models';
 /** Characters that trigger the suggestion. */
 const TRIGGER_CHARS = [
     " ",
-    ".",
-    ",",
-    ":",
-    "!",
-    "?",
     "(",
-    ")",
     "'",
     '"',
-    "/",
+    "\n",
 ];
 
 /** Provide completion suggestions for the user. */
